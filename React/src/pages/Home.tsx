@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState} from "react";
-import Gap from "../models/Gap";
+import GapGeneral from "../models/GapGeneral";
 import { Bar, getElementAtEvent } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -12,35 +12,25 @@ import {
   TooltipItem,
 } from "chart.js";
 import { useNavigate } from "react-router-dom";
+import chroma from "chroma-js";
+
 
 // Register the required components for Chart.js
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-interface ChartData
-{
-    labels: string[], // Default empty array for labels
-    datasets: {
-        label: string,
-        data: number[], // Default empty array for dataset values
-        backgroundColor: string,
-        borderColor: string,
-        borderWidth: number,
-        hoverBackgroundColor: string,
-      }[],
-}
-
 export default function Home()
 {
-    const [chartData, setChartData] = useState<ChartData>({
+    const [barData, setBarData] = useState({
         labels: [],
         datasets: [
             {
                 label: "",
                 data: [], 
                 backgroundColor: "rgba(75, 192, 192, 0.5)",
-                borderColor: "rgba(75, 192, 192, 1)",
-                borderWidth: 1,
-                hoverBackgroundColor: "rgba(255, 99, 132, 0.5)",               
+                barThickness: 3, 
+                hoverBackgroundColor: "rgba(75, 192, 192, 1)",
+                population: [],
+                gdp: [],          
             },
         ],
     });
@@ -48,30 +38,41 @@ export default function Home()
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
 
-    const chartRef = useRef(null);
+    const barRef = useRef(null);
 
     const navigate = useNavigate();
-
+    
     useEffect(() => {
         fetch(`http://localhost:5287/gender-gap/general/2019`)
         .then(response => response.json())
         .then(data => {
-            const countries = data.map((item: Gap) => item.countryName);
-            const generalGaps = data.map((item: Gap) => item.generalGap);
-            const ids = data.map((item: Gap) => item.countryId);
+            const regionList = [...new Set(data.map((item: GapGeneral) => item.regionName))];
+            const countryList = data.map((item: GapGeneral) => item.countryName);
+            const colorsHover = chroma.scale("Set3").colors(regionList.length);
+            const colors = colorsHover.map(color => chroma(color).alpha(0.5).css()); 
 
-            setChartData({
-                labels: countries,
-                datasets: [{
-                    label: "General Index (2019)",
-                    data: generalGaps,
-                    backgroundColor: "rgba(75, 192, 192, 0.5)",
-                    borderColor: "rgba(75, 192, 192, 1)",
-                    borderWidth: 1,
-                    hoverBackgroundColor: "rgba(255, 99, 132, 0.5)",      
-                },],
+            const subsetsByRegion = regionList.map((region, index) => {
+                const eachRegion = {
+                    label: region as string,
+                    data: data.map((item: GapGeneral) => 
+                        item.regionName === region ? item.generalGap : null),
+                    backgroundColor: colors[index],
+                    barThickness: 5,
+                    hoverBackgroundColor: colorsHover[index],
+                    population: data.map((item: GapGeneral) => 
+                        item.regionName === region ? item.population : null),
+                    gdp: data.map((item: GapGeneral) => 
+                        item.regionName === region ? item.gdpPerCapita : null),
+                }
+                return eachRegion;
             });
-            setCountryIds(ids);
+            
+            setBarData({
+                labels: countryList,
+                datasets: subsetsByRegion,
+            });
+
+            setCountryIds(data.map((item: GapGeneral) => item.countryId));
             setLoading(false);
         })
         .catch(() => setError(true))
@@ -79,7 +80,7 @@ export default function Home()
 
     
     const handleBarClick = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
-        const chart = chartRef.current;
+        const chart = barRef.current;
         if (chart) {
             const elements = getElementAtEvent(chart, event);
 
@@ -92,22 +93,68 @@ export default function Home()
         }
     }
 
-    const chartOptions = {
+    const barOptions = {
+        normalized: true, // inform data is indexed & sorted 
+        indexAxis: 'y' as string,
+        scales: {
+             x: {
+                max: 1,
+                min: 0,
+                ticks: {
+                    autoskip: false,
+                    stepSize: 0.1,
+                    font: {
+                        size: 7,
+                    },
+                },
+                grid: {
+                    display: true,
+                },
+             },
+             y: {
+                stacked: true,
+                ticks: {
+                    autoSkip: false,
+                    font: {
+                        size: 7,
+                    },
+                },
+                grid: {
+                    display: false,
+                },
+            }
+        },
+        maintainAspectRatio: false,
         responsive:true,
         plugins: {
-            legend: {
-                position: "top" as const,
-            },
             title: {
                 display: true,
-                text: "General Index",
+                text: "The global gender gap score in 2024 for all 146 countries included stands at 68.5% closed. It will take 134 years to reach full parity",
+            },
+            legend: {
+                display: false,
+                // position: "right",
+                // labels: {
+                //     usePointStyle: true,
+                //     pointStyle: 'circle',
+                //     font: {
+                //         size: 4,
+                //     }
+                // }
             },
             tooltip: {
                 callbacks: {
                     label: (tooltipItem: TooltipItem<"bar">) => {
                         const label = tooltipItem.dataset.label || "";
                         const value = tooltipItem.raw as number;
-                        return `${label} Index: ${value}`;
+                        const pop = tooltipItem.dataset.population[tooltipItem.dataIndex];
+                        const gdp = tooltipItem.dataset.gdp[tooltipItem.dataIndex];
+                        return [
+                            `${label}`, 
+                            `General Gap: ${value}`, 
+                            `Population: ${pop}`,
+                            `GDP per Capita: ${gdp}`,
+                        ];
                     }
                 }
             },
@@ -120,13 +167,14 @@ export default function Home()
 
     return (
         <div>
-            <h3>General Index for 2019</h3>
-            <Bar
-                ref={chartRef}
-                data={chartData}
-                options={chartOptions}
-                onClick={handleBarClick}
-            />
+            <div className="chart-container">
+                <Bar 
+                    ref={barRef}
+                    data={barData}
+                    options={barOptions}
+                    onClick={handleBarClick}
+                />
+            </div>
         </div>
     )
 }

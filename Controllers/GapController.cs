@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using myAppC.Models.Data;
+using myAppC.Models.Request;
 
 namespace myAppC.Controllers;
 
@@ -19,7 +21,9 @@ public class GapController(GenderContext context): Controller
     [HttpGet("country/{id}")]
     public IActionResult GetByCountryId(int id)
     {
-        var gaps = _context.Gaps.Where(item => item.CountryId == id).ToList();
+        var gaps = _context.Gaps
+                    .Where(item => item.CountryId == id)
+                    .ToList();
 
         if (gaps.Count == 0)
         {
@@ -32,14 +36,24 @@ public class GapController(GenderContext context): Controller
     [HttpGet("general/{year}")]
     public IActionResult GetGeneral(int year)
     {
-        var gaps = _context.Gaps
-                    .Where(item => item.Year == year).ToList();
+        var generals = _context.Gaps
+                    .Where(item => item.Year == year)
+                    .Select(item => new GapGeneral{
+                        CountryId = item.CountryId,
+                        CountryName = item.CountryName,
+                        RegionName = item.RegionName,
+                        GeneralGap = item.GeneralGap ,
+                        GdpPerCapita = item.GdpPerCapita,
+                        Population = item.Population, 
+                    })
+                    .OrderByDescending(item => item.GeneralGap)
+                    .ToList();
 
-        if (gaps.Count == 0)
+        if (generals.Count == 0)
         {
             return NotFound();
         }
 
-        return Ok(gaps);
+        return Ok(generals);
     }
 }

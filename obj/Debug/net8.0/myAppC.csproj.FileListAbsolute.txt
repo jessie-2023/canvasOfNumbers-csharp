@@ -154,3 +154,4 @@ C:\Users\JX\Refresh\myAppC\obj\Debug\net8.0\myAppC.genruntimeconfig.cache
 C:\Users\JX\Refresh\myAppC\obj\Debug\net8.0\ref\myAppC.dll
 C:\Users\JX\Refresh\myAppC\bin\Debug\net8.0\package-lock.json
 C:\Users\JX\Refresh\myAppC\bin\Debug\net8.0\package.json
+C:\Users\JX\Refresh\myAppC\obj\Debug\net8.0\myAppC.sourcelink.json
