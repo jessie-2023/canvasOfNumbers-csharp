@@ -21,9 +21,11 @@ ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, BarEleme
 
 // Helper function for generating color gradients, no need to DEFINE it in every render
 const generateMultiStopGradient = (colors: string[], steps: number) => {
-    const colorScale = d3.scaleLinear()
+    
+    const colorScale = d3.scaleLinear<string>()
       .domain(colors.map((_, i) => i / (colors.length - 1))) 
       .range(colors); 
+
     return Array.from({ length: steps }, (_, i) => colorScale(i / (steps - 1)));
   };
 
@@ -111,23 +113,23 @@ export default function CountryGenderGap()
                 display: true,
                 text: "The gender gap index is the average of parity index across the four dimensions",
             },
-            legend: {
-                labels: {
-                    generateLabels: (chart) => {
-                        const chartInstance = chartRef.current?.chartInstance;
-                        if (chartInstance) {
-                            const labels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-                            labels.forEach((label) => {
-                            const dataset = chart.data.datasets[label.datasetIndex];
-                            if (dataset.type === "line") {
-                                labels.usePointStyle = true;
-                            } 
-                        })
-                        }
+            // legend: {
+            //     labels: {
+            //         generateLabels: (chart) => {
+            //             const chartInstance = chartRef.current?.chartInstance;
+            //             if (chartInstance) {
+            //                 const labels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+            //                 labels.forEach((label) => {
+            //                 const dataset = chart.data.datasets[label.datasetIndex];
+            //                 if (dataset.type === "line") {
+            //                     labels.usePointStyle = true;
+            //                 } 
+            //             })
+            //             }
                         
-                    }
-                }
-            }
+            //         }
+            //     }
+            // }
         },
     }
 
