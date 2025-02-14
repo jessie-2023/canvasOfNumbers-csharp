@@ -47,9 +47,10 @@
   overflow-y: scroll;
 }
 
-// world map
+world map
 .marks .land {
-  fill: #137B80;
+  // fill: #137B80;
+  opacity: 0.2;
 }
 .marks .sphere {
   fill: #ececec;

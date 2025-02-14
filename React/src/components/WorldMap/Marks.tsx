@@ -6,27 +6,42 @@ import { useMemo } from 'react';
 const projection = geoNaturalEarth1();
 const path = geoPath(projection);
 const graticule = geoGraticule();
+const missingDataColor = '#dadada';
 
-
-export const Marks = ({ data }: { data: WorldAltas }) => 
-{
-
-  return (
+export const Marks = ({ 
+  world: { countries, interiors },
+  mapByCountry,
+  colorScale,
+  colorValue
+}) =>  (
   <g className="marks">
     {useMemo(
       () => (
         <>
           <path className="sphere" d={path({ type: 'Sphere' }) as string} />
           <path className="graticules" d={path(graticule()) as string} />
-          {data.countries.features.map(feature => (
-            <path className="land" d={path(feature) as string} />
-          ))}
-          <path className="interiors" d={path(data.interiors) as string} />
+          {countries.features.map(feature => {
+
+            const country = mapByCountry.get(Number(feature.id));
+
+            return (
+            <path className="land" 
+              fill={country ? colorScale(colorValue(country)) : missingDataColor}
+              opacity={0.75}
+              d={path(feature) as string} 
+            />
+          )
+          
+          })}
+          <path className="interiors" d={path(interiors) as string} />
         </>
       ),
-      [data.countries.features, data.interiors]
+      [ countries, interiors,
+        mapByCountry,
+        colorScale,
+        colorValue]
     )}
   </g>
 
 );
-}
+
