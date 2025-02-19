@@ -1,4 +1,4 @@
-export default interface Gap
+export default interface GapGeneral
 {
     countryId: number;
     countryName: string; 

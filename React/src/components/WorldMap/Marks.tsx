@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 const projection = geoNaturalEarth1();
 const path = geoPath(projection);
 const graticule = geoGraticule();
-const missingDataColor = '#dadada';
+const missingDataColor = 'lightgray';
 
 export const Marks = ({ 
   world: { countries, interiors },
@@ -27,7 +27,6 @@ export const Marks = ({
             return (
             <path className="land" 
               fill={country ? colorScale(colorValue(country)) : missingDataColor}
-              opacity={0.75}
               d={path(feature) as string} 
             />
           )

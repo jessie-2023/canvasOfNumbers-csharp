@@ -47,19 +47,29 @@
   overflow-y: scroll;
 }
 
-world map
-.marks .land {
-  // fill: #137B80;
-  opacity: 0.2;
-}
+// world map
 .marks .sphere {
-  fill: #ececec;
+  // fill: #fbfbfb;
+  fill: blue; opacity: 0.1;
 }
 .marks .interiors {
   fill: none;
-  stroke: #43A4A8;
+  stroke: #d9dfe0;
 }
-.marks .graticules {
+.marks .graticules, .tick line {
   fill: none;
-  stroke: #dadada;
+  stroke: #ececec;
+}
+
+
+.tick text {
+  fill: #635F5D;
+  font-size: 0.5em;
+}
+.mark {
+  fill: #137B80;
+}
+.axis-label {
+  font-size: 0.5em;
+  fill: #635F5D;
 }

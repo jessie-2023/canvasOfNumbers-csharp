@@ -5,18 +5,17 @@ import { FeatureCollection } from "geojson";
 import { Marks } from './Marks';
 import WorldAtlas from '../../models/WorldAtlas';
 import getWorldAtlas from '../../api/worldAtlasClient';
-import Gap from '../../models/GapGeneral';
+import GapGeneral from '../../models/GapGeneral';
 import { getGeneralByYear } from '../../api/backendClient';
-import GenderGap from '../../pages/GenderGap';
 import { scaleSequential } from 'd3-scale';
-import { interpolateCubehelixDefault as colorGradience, max, min } from 'd3';
+import { interpolateGnBu as colorGradience, max, min } from 'd3';
 
-const width = 960;
-const height = 500;
+
 const year = 2019;
-export const WorldMap = () => {
+
+export const WorldMap = ({width, height}) => {
     const [world, setWorld] = useState<WorldAtlas>();
-    const [gaps, setGaps] = useState<Gap[]>();
+    const [gaps, setGaps] = useState<GapGeneral[]>();
     
     useEffect(() => {
         getWorldAtlas().then((topology: Topology) => {
@@ -40,11 +39,10 @@ export const WorldMap = () => {
   const mapByCountry = new Map();
   gaps.forEach(country => mapByCountry.set(country.countryId, country)) 
 
-  const colorValue = (gap: Gap) => gap.generalGap;
-  const colorScale = scaleSequential(colorGradience).domain([
-    // min(gaps, colorValue)!,
-    0.3,
-    max(gaps, colorValue)! // promise min & max are NOT undefined
+  const colorValue = (gap: GapGeneral) => gap.generalGap; 
+  const colorScale = scaleSequential(colorGradience).domain([ // swap min-max order can reverse the color gradience
+    max(gaps, colorValue)!,
+    min(gaps, colorValue)! // promise min & max are NOT undefined
   ])
   
   return (
