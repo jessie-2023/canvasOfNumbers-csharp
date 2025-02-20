@@ -11,9 +11,8 @@ import { scaleSequential } from 'd3-scale';
 import { interpolateGnBu as colorGradience, max, min } from 'd3';
 
 
-const year = 2019;
 
-export const WorldMap = ({width, height}) => {
+export const WorldMap = ({width, height, clickedYear, setSelectedCountry}) => {
     const [world, setWorld] = useState<WorldAtlas>();
     const [gaps, setGaps] = useState<GapGeneral[]>();
     
@@ -27,9 +26,9 @@ export const WorldMap = ({width, height}) => {
     }, []);
 
     useEffect(() => {
-      getGeneralByYear(year)
+      getGeneralByYear(clickedYear)
         .then(data => setGaps(data))
-    }, []);
+    }, [clickedYear]);
 
 
   if (!world || !gaps || !gaps.length) {
@@ -41,8 +40,8 @@ export const WorldMap = ({width, height}) => {
 
   const colorValue = (gap: GapGeneral) => gap.generalGap; 
   const colorScale = scaleSequential(colorGradience).domain([ // swap min-max order can reverse the color gradience
-    max(gaps, colorValue)!,
-    min(gaps, colorValue)! // promise min & max are NOT undefined
+    1,
+    0.451 // promise min & max are NOT undefined
   ])
   
   return (
@@ -52,7 +51,7 @@ export const WorldMap = ({width, height}) => {
         mapByCountry={mapByCountry}
         colorScale={colorScale}
         colorValue={colorValue}
-
+        setSelectedCountry={setSelectedCountry}
       />
     </svg>
   );

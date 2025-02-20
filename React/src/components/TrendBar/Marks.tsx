@@ -1,3 +1,5 @@
+import Gap from "../../models/Gap";
+
 export const Marks = ({
   data,
   xScale,
@@ -5,8 +7,14 @@ export const Marks = ({
   xValue,
   yValue,
   innerHeight,
-}) =>
-  data.map(d => (
+  setClickedYear
+}) => {
+
+  const handleYearClick = (d: Gap) => {
+    setClickedYear(d.year); // Update state in parent
+    };
+
+  return( data.map(d => (
     <rect
       className="mark"
       key={xValue(d)}
@@ -14,7 +22,10 @@ export const Marks = ({
       y={yScale(yValue(d))}
       height={innerHeight-yScale(yValue(d))}
       width={xScale.bandwidth()}
+      onClick={() => handleYearClick(d)}
     >
-      <title>{data.CountryName}</title>
+      <title>{d.year}</title>
     </rect>
-  ));
+  )))
+}
+  

@@ -4,7 +4,7 @@ export const AxisX = ({ xScale, innerHeight }) =>
       <text
         key={tickValue}
         style={{ textAnchor: 'end' }}
-        y={0}
+        y={innerHeight + 10}
         dx=".71em" 
         x={xScale(tickValue) + xScale.bandwidth() / 2}
       >

@@ -7,9 +7,8 @@ import Gap from '../../models/Gap';
 import { getGapsByCountryId } from '../../api/backendClient';
 import { max, scaleBand, scaleLinear } from 'd3';
 
-const countryId = 352;
 
-const margin = { top: 10, right: 200, bottom: 0, left: 220 };
+const margin = { top: 10, right: 200, bottom: 15, left: 200 };
 const xAxisLabelOffset = 54;
 const yAxisLabelOffset = 30;
 // const xAxisTickFormat = timeFormat('%m/%d/%Y');
@@ -17,13 +16,14 @@ const yAxisLabelOffset = 30;
 const xAxisLabel = 'Year';
 const yAxisLabel = 'General Gender Gap';
 
-export const TrendBar = ({width, height}) => {
+export const TrendBar = ({width, height, selectedCountry, setClickedYear}) => {
+  
   const [gaps, setGaps] = useState<Gap[]>();
 
   useEffect(() => {
-    getGapsByCountryId(countryId)
+    getGapsByCountryId(selectedCountry)
           .then(data => setGaps(data))
-      }, []);
+      }, [selectedCountry]);
   
   if (!gaps) {
     return <pre>Loading...</pre>;
@@ -31,7 +31,7 @@ export const TrendBar = ({width, height}) => {
   
   const innerHeight = height - margin.top - margin.bottom;
   const innerWidth = width - margin.left - margin.right;
-  console.log(innerHeight, height)
+
   const xValue = (gap: Gap) => String(gap.year);
   const xScale = scaleBand()
     .domain(gaps.map(xValue))
@@ -40,7 +40,7 @@ export const TrendBar = ({width, height}) => {
 
   const yValue = (gap: Gap) => gap.generalGap as number;
   const yScale = scaleLinear()
-    .domain([0, 0.892]) // replace with all-max later
+    .domain([0, 0.892]) // replace hard coding with max() later
     .range([innerHeight, 0]);
 
   return (<>
@@ -57,7 +57,7 @@ export const TrendBar = ({width, height}) => {
           transform={`translate(${-yAxisLabelOffset},${innerHeight /
             2}) rotate(-90)`}
         >
-          Gender Gap
+          Gender Gap in {gaps[0].countryName}
         </text>
         <Marks
           data={gaps}
@@ -66,6 +66,7 @@ export const TrendBar = ({width, height}) => {
           xValue={xValue}
           yValue={yValue}
           innerHeight={innerHeight}
+          setClickedYear={setClickedYear}
         />
       </g>
     </>);
