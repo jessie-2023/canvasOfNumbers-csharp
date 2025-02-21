@@ -23,7 +23,8 @@ export const Marks = ({
     setSelectedCountry(country.countryId); 
   };
   
-  console.log("Hovered country:", hoveredCountry);
+  // console.log("Hovered country:", hoveredCountry);
+
   return (<g className="marks">
     
           <path className="sphere" d={path({ type: 'Sphere' }) as string} />
