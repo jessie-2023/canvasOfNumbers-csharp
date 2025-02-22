@@ -15,9 +15,10 @@ export default function Home()
     const [clickedCountry, setClickedCountry] = useState<number>(352);   
     const [clickedYear, setClickedYear] = useState<number>(2019);
     
-    return (
+    return (<>
+    <h1 className="title">Gender Equality Worldwide: How Far Have We Come?</h1>
         <svg width={width} height={height}>
-            <g transform={`scale(${mapShare}) translate(${(1 - mapShare) * width / 2}, 0)`}>
+            <g transform={`scale(${mapShare}) translate(${(1 - mapShare) * width / 2 - 80}, 0)`}>
                 <WorldMap 
                     width={width}
                     height={height}
@@ -25,7 +26,7 @@ export default function Home()
                     setSelectedCountry={setClickedCountry}
                 />
             </g>
-            <g transform={`translate(0, ${height - barShare * height})`}>
+            <g transform={`translate(-80, ${height - barShare * height})`}>
                 <TrendBar 
                     width={width}
                     height={barShare * height}
@@ -35,5 +36,5 @@ export default function Home()
             </g>
         </svg>
             
-    )
+    </>)
 }

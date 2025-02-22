@@ -22,16 +22,15 @@ export const Marks = ({
       stacked.map((subIndex, j) => (
         subIndex.map((s, i) => {
           // Calculate the y position for the stacked bar
-      const yBot = j === 0 ? 0 : stacked[j - 1][i][1];
-      const yTop = s[1];
+          const yBot = j === 0 ? 0 : stacked[j - 1][i][1];
+          const yTop = s[1];
+          // Calculate the height of each sub-bar
+          const height = innerHeight - yScale(yTop - yBot);
 
-      // Calculate the height of each sub-bar
-      const height = innerHeight - yScale(yTop - yBot);
-
-          console.log(`x: ${xScale(xValue(i))}`);
-          console.log(`y: ${yScale(yValue(s))}`);
-          console.log(`y: ${yScale(yBotValue(s))}`);
-          console.log(`color: ${colorScale(colorValue(j))}`);
+          // console.log(`x: ${xScale(xValue(i))}`);
+          // console.log(`y: ${yScale(yValue(s))}`);
+          // console.log(`y: ${yScale(yBotValue(s))}`);
+          // console.log(`color: ${colorScale(colorValue(j))}`);
           
           return (
             <rect
@@ -44,7 +43,7 @@ export const Marks = ({
               fill={colorScale(colorValue(j))}
               onClick={() => handleYearClick(i)}
             >
-              <title>{xValue(i)}</title>
+              <title>{`${colorValue(j)}: ${Math.round((yTop - yBot) * 400)}%`}</title>
             </rect>
           );
         })

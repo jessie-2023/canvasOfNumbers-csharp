@@ -9,6 +9,7 @@ import GapGeneral from '../../models/GapGeneral';
 import { getGeneralByYear } from '../../api/backendClient';
 import { scaleSequential } from 'd3-scale';
 import { interpolateGnBu as colorGradience, max, min } from 'd3';
+import { ColorLegend } from './colorLegend';
 
 
 
@@ -53,6 +54,9 @@ export const WorldMap = ({width, height, clickedYear, setSelectedCountry}) => {
         colorValue={colorValue}
         setSelectedCountry={setSelectedCountry}
       />
+      <g transform={`translate(${920},${innerHeight /2}) rotate(-90)`}>
+        <ColorLegend colorScale={colorScale} width={300} height={20} />
+      </g>
     </svg>
   );
 };
