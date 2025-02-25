@@ -3,6 +3,7 @@ namespace myAppC.Models.Transfer;
 
 public class GgiRaw
 {
+    public required int CountryId { get; set; }
     public required string Country { get; set; }
 
     public required string Region { get; set; } = null!;

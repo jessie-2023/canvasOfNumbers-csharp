@@ -1,12 +1,11 @@
 
-import { useRef, useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AxisX } from './AxisX';
 import { AxisY } from './AxisY';
 import { Marks } from './Marks';
 import Gap from '../../models/Gap';
 import { getGapsByCountryId } from '../../api/backendClient';
-import { index, max, scaleBand, scaleLinear, scaleOrdinal, stack, union } from 'd3';
-import CountryGenderGap from '../../pages/CountryGenderGap';
+import { index, scaleBand, scaleLinear, scaleOrdinal, stack } from 'd3';
 import { ColorLegend } from './ColorLegend';
 
 
@@ -16,20 +15,19 @@ const yAxisLabelOffset = 30;
 // const xAxisTickFormat = timeFormat('%m/%d/%Y');
 const fadeOpacity = 0.2;
 
-const xAxisLabel = 'Year';
-const yAxisLabel = 'General Gender Gap';
+
 const colorLegendLabel = 'Dimensions of Gender Parity';
 const parityDimensions = ["Health and Survival", "Educational Attainment", "Economic Participation and Opportunity", "Political Empowerment"]
 
-export const TrendBar = ({width, height, selectedCountry, setClickedYear}) => {
+export const TrendBar = ({width, height, setClickedYear , clickedYear, clickedCountry}) => {
   
   const [gaps, setGaps] = useState<Gap[]>();
   const [hoveredValue, setHoveredValue] = useState(null);
 
   useEffect(() => {
-    getGapsByCountryId(selectedCountry)
+    getGapsByCountryId(clickedCountry)
           .then(data => setGaps(data))
-      }, [selectedCountry]);
+      }, [clickedCountry]);
   
   if (!gaps) {
     return <pre>Loading...</pre>;
@@ -60,14 +58,12 @@ export const TrendBar = ({width, height, selectedCountry, setClickedYear}) => {
     .paddingInner(0.15);
   // console.log(`x: ${xValue(stacked[0], 0)}`)
   
-  const yValue = s => s[1]
-  const yBotValue = s => s[0]
   const yScale = scaleLinear()
     .domain([0, 0.892]) // replace hard coding with max() later
     .range([innerHeight, 0]);
   // console.log(`y: ${yValue(stacked[0], 0)}`)
 
-  const colorValue = (j) => parityDimensions[j];
+  const colorValue = (s) => s.key;
   const colorScale = scaleOrdinal()
     .domain(parityDimensions) 
     .range(["#BA5F06", "#BD8F22", "#F6B656", "#F2DA57"])
@@ -76,7 +72,7 @@ export const TrendBar = ({width, height, selectedCountry, setClickedYear}) => {
   const hoveredDimension = stacked.filter(s => hoveredValue === s.key);
 
   return (<>
-    <rect width={width} height={height} fill="red" opacity={0.1} />
+    <rect width={width} height={height} fill="red" opacity={0.05} />
       <g transform={`translate(${margin.left},${margin.top})`}>
         <AxisX
           xScale={xScale}
@@ -103,34 +99,35 @@ export const TrendBar = ({width, height, selectedCountry, setClickedYear}) => {
             onHover={setHoveredValue}
             hoveredValue={hoveredValue}
             fadeOpacity={fadeOpacity}
+            xScale={xScale}
           />
         </g>
-        <g opacity={hoveredValue ? fadeOpacity : 1}>
+        <g opacity={hoveredValue ? fadeOpacity : 0.9}>
           <Marks
             stacked={stacked}
             xScale={xScale}
             yScale={yScale}
             colorScale={colorScale}
             xValue={xValue}
-            yValue={yValue}
-            yBotValue={yBotValue}
             colorValue={colorValue}
             innerHeight={innerHeight}
             setClickedYear={setClickedYear}
+            clickedYear={clickedYear}
           />
         </g>
-        <Marks
+        <g opacity={0.8}>
+        <Marks 
           stacked={hoveredDimension}
           xScale={xScale}
           yScale={yScale}
           colorScale={colorScale}
           xValue={xValue}
-          yValue={yValue}
-          yBotValue={yBotValue}
           colorValue={colorValue}
           innerHeight={innerHeight}
           setClickedYear={setClickedYear}
+          clickedYear={clickedYear}
         />
+        </g>
       </g>
     </>);
 };

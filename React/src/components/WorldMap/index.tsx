@@ -13,7 +13,7 @@ import { ColorLegend } from './colorLegend';
 
 
 
-export const WorldMap = ({width, height, clickedYear, setSelectedCountry}) => {
+export const WorldMap = ({width, height, clickedCountry, clickedYear, setClickedCountry}) => {
     const [world, setWorld] = useState<WorldAtlas>();
     const [gaps, setGaps] = useState<GapGeneral[]>();
     
@@ -52,7 +52,9 @@ export const WorldMap = ({width, height, clickedYear, setSelectedCountry}) => {
         mapByCountry={mapByCountry}
         colorScale={colorScale}
         colorValue={colorValue}
-        setSelectedCountry={setSelectedCountry}
+        setClickedCountry={setClickedCountry}
+        clickedCountry={clickedCountry}
+
       />
       <g transform={`translate(${920},${innerHeight /2}) rotate(-90)`}>
         <ColorLegend colorScale={colorScale} width={300} height={20} />

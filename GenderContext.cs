@@ -39,14 +39,14 @@ public class GenderContext: DbContext
         }
         modelBuilder.Entity<Region>().HasData(regionNames.ToArray()); // HasData accepts an array of objects. Converting the list to an array ensures compatibility and avoids potential runtime issues.
 
-        // Table for country name
+        // Table for country code (complete list later)
         var countryNames = new List<Country>();
         var distinctCountries = ggiRaw.DistinctBy(ggi => ggi.Country).ToList();
         for (var i = 0; i < distinctCountries.Count; i++)
         {
             var country = new Country
             {
-                Id = i + 1,
+                Id = distinctCountries[i].CountryId,
                 Name = distinctCountries[i].Country, 
             };
             countryNames.Add(country);           
@@ -60,7 +60,7 @@ public class GenderContext: DbContext
             var gap = new Gap
             {
                 Id = i + 1,
-                CountryId = countryNames.Where(c => c.Name == ggiRaw[i].Country).Select(c => c.Id).FirstOrDefault(),
+                CountryId = ggiRaw[i].CountryId,
                 CountryName = ggiRaw[i].Country,
                 RegionId = regionNames.Where(r => r.Name == ggiRaw[i].Region).Select(r => r.Id).FirstOrDefault(),
                 RegionName = ggiRaw[i].Region,

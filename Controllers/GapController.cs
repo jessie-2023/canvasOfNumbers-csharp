@@ -23,6 +23,7 @@ public class GapController(GenderContext context): Controller
     {
         var gaps = _context.Gaps
                     .Where(item => item.CountryId == id)
+                    .OrderBy(g => g.Year)
                     .ToList();
 
         if (gaps.Count == 0)

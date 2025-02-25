@@ -6,7 +6,8 @@ export const ColorLegend = ({
     tickTextOffset,
     onHover,
     hoveredValue,
-    fadeOpacity
+    fadeOpacity,
+    xScale
 }) => 
     colorScale.domain().map((domainValue, i) =>(
         <g
@@ -21,7 +22,7 @@ export const ColorLegend = ({
               }}
               opacity={hoveredValue && domainValue !== hoveredValue ? fadeOpacity : 1}
             >
-            <rect fill={colorScale(domainValue)} y={-tickSize / 2} width={tickSize} height={tickSize}/>
+            <rect fill={colorScale(domainValue)} y={-tickSize / 2} width={xScale.bandwidth()} height={tickSize}/>
             <text x={tickTextOffset} dy=".32em">{domainValue}</text>
         </g>
     ))
